@@ -1,0 +1,27 @@
+\begin{abstract}
+Public facial-symmetry tools take a single 2D photo, detect landmarks, reflect them
+about a midline and always return a score, even when the photo cannot support one.
+We build a system that accepts one face photo and returns a 2D geometric asymmetry
+measure (global and per region) only when it is trustworthy, together with an
+accept/caution/reject decision and its reasons. The method has three parts:
+(i) asymmetry measured with fixed anatomical left/right pairs and a \emph{fitted}
+symmetry axis, rather than nearest-neighbour matching about an assumed vertical midline;
+(ii) a \emph{mirror test}, which runs the landmark detector on the photo and on its
+mirror image and compares the two results, giving a label-free check of landmark
+reliability and averaging out any left/right detector bias;
+(iii) a quality gate on face size, sharpness, exposure, head pose and mirror
+consistency, with thresholds set on a training split.
+Since no dataset contains true symmetry labels, we evaluate against the same measure
+computed from human-annotated landmarks (LFPW/300-W, 224 test images) and under 26
+controlled perturbations (5{,}824 perturbed images).
+The fitted-axis measure agrees far better with this annotation-based reference than a
+re-implemented public baseline (Spearman $\rho$ \rhoMthree{} vs.\ \rhoMzero{}); the
+baseline's KD-tree matching pairs \kdWrong\% of points with the wrong anatomical
+partner. The mirror test ranks images by landmark error without ground truth
+($\rho$ = \rhoMirrorNme{}), and mirror averaging cuts score drift under perturbation by
+\driftReduction\%. The gate reduces silent failures (scores reported with error
+$>$1\% of the inter-ocular distance) from \silentPoolOne\% to \silentPoolThree\%.
+We also find that on in-the-wild photos the measured 2D asymmetry follows head yaw
+almost one-to-one ($\rho$ = \rhoYawRef{}), even when computed from expert annotations.
+This means pose gating is essential, not optional.
+\end{abstract}

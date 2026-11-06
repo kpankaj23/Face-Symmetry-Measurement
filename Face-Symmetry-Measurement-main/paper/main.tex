@@ -1,0 +1,64 @@
+% EE604 course project write-up, typeset with the CVPR author kit (2022/2023 style files:
+% cvpr.sty + ieee_fullname.bst), as required by the course guidelines.
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}              % camera-ready mode so that author names are shown
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=blue!60!black]{hyperref}
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\crefname{table}{Tab.}{Tabs.}
+\crefname{figure}{Fig.}{Figs.}
+
+\lstset{basicstyle=\ttfamily\fontsize{6.2}{7.0}\selectfont, breaklines=true,
+        columns=fullflexible, keepspaces=true, showstringspaces=false,
+        commentstyle=\color{black!55}, keywordstyle=\color{blue!60!black},
+        language=Python, frame=none, xleftmargin=0pt}
+
+\input{tables/numbers}
+\newcommand{\repo}{\url{https://github.com/pruthav23/Face-Symmetry-Measurement}}
+
+\def\cvprPaperID{EE604}
+\def\confName{EE604}
+\def\confYear{2026}
+
+\begin{document}
+
+\title{Face Symmetry Measurement: A Quality-Aware, Mirror-Consistent\\
+Facial Asymmetry Analysis System}
+
+\author{
+Ankit Yadav (230150)\quad Ashish Porwal (230229)\quad Mahi Mittal (230617)\\
+Pankaj Kumar (230733)\quad Prutha Vinay (230807)\\
+EE604 Image Processing, Course Project, IIT Kanpur\\
+{\small Code: \repo}
+}
+
+\maketitle
+
+\input{sec/0_abstract}
+\input{sec/1_intro}
+\input{sec/2_related}
+\input{sec/3_method}
+\input{sec/4_experiments}
+\input{sec/5_discussion}
+
+{\small
+\bibliographystyle{ieee_fullname}
+\bibliography{main}
+}
+
+\clearpage
+\appendix
+\input{sec/6_appendix}
+
+\end{document}

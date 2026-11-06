@@ -1,0 +1,48 @@
+{
+ "thresholds": {
+  "iod_px": {
+   "direction": "min",
+   "caution": 60.0,
+   "reject": 30.0
+  },
+  "sharpness": {
+   "direction": "min",
+   "caution": 1.4033274562916331,
+   "reject": 0.7560554561272539
+  },
+  "brightness_lo": {
+   "direction": "min",
+   "caution": 59.264828731489146,
+   "reject": 35.0
+  },
+  "brightness_hi": {
+   "direction": "max",
+   "caution": 164.3667062848189,
+   "reject": 225.0
+  },
+  "clipped": {
+   "direction": "max",
+   "caution": 0.3644282930789619,
+   "reject": 0.6
+  },
+  "abs_yaw": {
+   "direction": "max",
+   "caution": 10.0,
+   "reject": 20.0
+  },
+  "abs_pitch": {
+   "direction": "max",
+   "caution": 15.0,
+   "reject": 25.0
+  },
+  "mirror_incons": {
+   "direction": "max",
+   "caution": 0.022440714006451968,
+   "reject": 0.04892481509679767
+  }
+ },
+ "region_mirror_limit": 0.04441651578719881,
+ "index_alpha_per_pct": 0.4665355463445921,
+ "calibrated_on": "LFPW trainset, 810 detected faces of 811",
+ "rules": "\nCalibrate the data-dependent gate thresholds on the LFPW TRAINING split only.\n\nRules (written down before looking at test results):\n  * a-priori limits from the measurement's assumptions (not tuned):\n      |yaw|   caution 10 deg, reject 20 deg   (left-right comparison in 2D)\n      |pitch| caution 15 deg, reject 25 deg\n      IOD     caution 60 px,  reject 30 px    (landmark quantisation becomes ~1-3 % of IOD)\n      exposure reject: mean luma < 35 or > 225\n  * statistic limits from the distribution of *clean* training images:\n      sharpness caution = 2.5th percentile, reject = 0.5th percentile of train - 0.3\n      brightness caution = 2.5th / 97.5th percentiles\n      clipped caution = 97.5th percentile, reject = max(0.6, caution + 0.15)\n      mirror inconsistency caution = 90th percentile, reject = 99th percentile\n      per-region mirror limit = 97.5th percentile over all regions\n  * readable index S = 100 / (1 + alpha * A[%]) with alpha s.t. the train median maps to 50.\nWrites configs/gate_thresholds.json\n"
+}

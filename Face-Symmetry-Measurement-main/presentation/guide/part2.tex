@@ -1,0 +1,200 @@
+%======================================================================
+\section{Our method, step by step}
+%======================================================================
+
+\begin{figure}[h]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\sffamily\small,>=Stealth,
+  box/.style={draw=black!55,rounded corners=2pt,fill=#1,align=center,inner sep=4pt,minimum height=1.0cm,text width=2.4cm},
+  box/.default=white, arr/.style={->,thick,black!65}]
+\node[box=black!4] (in) at (0,0) {Photo $I$};
+\node[box=blue!8] (d1) at (3.2,0.9) {Landmarker on $I$};
+\node[box=blue!8] (d2) at (3.2,-0.9) {Landmarker on flip$(I)$};
+\node[box=blue!15] (mt) at (6.5,0) {\textbf{Mirror test}\\\scriptsize $\delta$ and average $\bar L$};
+\node[box=green!10] (map) at (9.8,0) {478$\to$68 map};
+\node[box=green!18] (ax) at (13.1,0) {\textbf{Fitted axis}\\\scriptsize $A$, $A_r$};
+\node[box=orange!18] (gate) at (9.8,-2.2) {\textbf{Quality gate}\\\scriptsize size, blur, light, yaw, pitch, $\delta$};
+\node[box=black!8] (out) at (16.4,-1.1) {\textbf{Output}\\\scriptsize accept / caution / reject};
+\draw[arr] (in) -- (d1); \draw[arr] (in) -- (d2);
+\draw[arr] (d1) -- (mt); \draw[arr] (d2) -- (mt);
+\draw[arr] (mt) -- (map); \draw[arr] (map) -- (ax);
+\draw[arr] (mt) |- (gate); \draw[arr] (ax) -- (out); \draw[arr] (gate) -| (out);
+\end{tikzpicture}}
+\caption{The full system (variant M3). The numbered steps below follow this picture.}
+\end{figure}
+
+\subsection{Step 1: detect landmarks (\texttt{detector.py})}
+\textbf{What:} run MediaPipe Face Landmarker on the photo. We get 478 points in pixel
+coordinates and the transformation matrix, from which we read yaw, pitch and roll.\\
+\textbf{Why MediaPipe:} it is pretrained (no training needed), fast on a CPU, and its mesh has
+a \emph{fixed topology}: vertex 33 is always the same anatomical spot, on every face. That
+is what makes fixed pairs possible.\\
+\textbf{Limitation:} it gives no confidence per landmark (the \texttt{visibility} field is empty).
+The mirror test (Step 5) fills this gap.
+
+\subsection{Step 2: find each point's mirror twin (\texttt{mesh.py})}\label{sec:perm}
+\textbf{What:} take the canonical face model, flip it ($x\to -x$), and for each vertex find the
+vertex that lands in its place. Because the canonical model is exactly symmetric, this
+match is perfect (error 0). It gives a \textbf{mirror permutation} $\pi$: $\pi(i)$ is the
+twin of vertex $i$. Result: 220 bilateral pairs and 28 midline vertices (which map to
+themselves), plus the iris points, paired by hand.\\
+\textbf{Why:} the twin is fixed by anatomy, not guessed per photo. This removes the
+baseline's wrong-partner problem completely (0\% wrong partners).
+
+\subsection{Step 3: map the 478-point mesh to the 68-point layout}
+\textbf{What:} for each of the 68 standard points, choose the mesh vertex that best plays its
+role. We do this \emph{on training images only}: for every standard point $k$ and every mesh
+vertex $v$, we compute how far $v$ typically is from the expert's point $k$ (median over
+810 training faces, divided by IOD). Call this $E_{kv}$. For a bilateral pair $(a,b)$ of the
+68 points we choose
+\[ v^\star = \arg\min_v \; E_{a v} + E_{b\,\pi(v)}, \qquad a \to v^\star, \quad b \to \pi(v^\star). \]
+\textbf{Why this way:} choosing the two sides \emph{together}, as mirror twins, guarantees
+the mapping is itself perfectly symmetric. If the left eye corner were mapped slightly
+differently from the right eye corner, the mapping alone would create fake asymmetry.\\
+\textbf{Why 68 points at all:} expert annotations exist for these points, so we can check our
+measurements against experts. The fitted map is also more accurate than the commonly used
+hand-made map: NME \nmeFitInner\% vs.\ \nmeHandInner\% (inner points), and \nmeFitJaw\% vs.\
+\nmeHandJaw\% on the jaw.
+
+\subsection{Step 4: fit the symmetry axis and measure asymmetry (\texttt{geometry.py})}
+\textbf{What:} instead of assuming the midline is vertical, we search for the line (angle
+$\theta$, offset $\rho$) that best explains the face as a mirror image:
+\[ (\theta^\star,\rho^\star)=\arg\min_{\theta,\rho}\sum_{i}\big\|\mathcal{R}_{\theta,\rho}(p_{\pi(i)})-p_i\big\|^2 . \]
+In words: reflect each point's twin across a candidate line, measure how far it lands from
+the point, and pick the line that makes these gaps as small as possible overall. We start
+from a closed-form guess (midpoints and directions of the pairs) and refine it with the
+Nelder--Mead optimiser. Only the 51 inner-face points are used to fit it.
+
+Then, with residual $r_i$ = reflection of the twin minus the point:
+\[ a_i=\frac{\|r_i\|}{2\cdot\text{IOD}}, \qquad A=\text{mean of } a_i \text{ over the 51 inner points}, \qquad A_r=\text{mean over region } r. \]
+The factor 2 is there because a gap $r_i$ is shared by two points. $a_i$ is how far point
+$i$ is from the closest perfectly symmetric face.
+
+\textbf{Why fit the axis:}
+\begin{itemize}
+\item It is \textbf{rotation-invariant}: tilt the photo and $A$ does not change (a unit test checks this for $-30^\circ$ to $+25^\circ$, with scaling and shifting).
+\item It does not depend on two special points being correct.
+\item It needs no second detection pass, unlike the baseline's align-and-re-detect step.
+\end{itemize}
+
+\begin{idea}[Worked example (this is one of our unit tests)]
+Take a perfectly symmetric face, so $A=0$. Move the inner corner of one eye 2 pixels outward.
+The fitted axis barely moves, the gap between that corner and its reflected twin becomes
+about 2 pixels, and each of the two corners gets $a_i \approx 1$ pixel / IOD. The
+\emph{Eyes} region now has the largest regional value, as it should.
+\end{idea}
+
+\textbf{Why the jaw is excluded from $A$:} the 17 jaw points trace the visible outline
+(silhouette) of the face. Their position along the cheek shifts with head pose, and
+MediaPipe's outline does not correspond to them point for point (jaw NME \nmeFitJaw\% vs.\
+\nmeFitInner\% for the inner points). The jaw is still shown as a region.
+
+\subsection{Step 5: the mirror test}
+\textbf{What:} run the detector a second time, on the horizontally flipped photo. Then map
+the result back:
+\begin{itemize}
+\item a point at $x'$ in the flipped photo is at $W-x'$ in the original ($W$ = image width;
+MediaPipe uses continuous coordinates, so it is $W-x'$, not $W-1-x'$, which we checked:
+using $W-1$ left a systematic 1-pixel offset);
+\item flipping swaps sides, so the vertex the detector calls $j$ in the flipped photo is the
+original's vertex $\pi(j)$.
+\end{itemize}
+This gives a second set of landmarks $U$ for the \emph{same} face. A perfect detector would give
+$U=L$.
+
+\textbf{What we get from it:}
+\begin{enumerate}
+\item \textbf{Mirror inconsistency} $\delta$ = mean distance between $L$ and $U$ / IOD. Large
+$\delta$ means the detector is unsure of the geometry. It correlates with true landmark
+error ($\rho$ = \rhoMirrorNme{}), and it needs no labels.
+\item \textbf{Averaged landmarks} $\bar L=\tfrac12(L+U)$. If the detector systematically
+pushes points to one side, the flip pushes them the other way, and the average cancels it.
+This reduces score drift on degraded photos by \driftReduction\%.
+\item \textbf{Stability band} $|A(L)-A(U)|$, shown to the user as ``$\pm$''.
+\item \textbf{Per-region inconsistency} $\delta_r$, used to grey out unreliable regions.
+\end{enumerate}
+
+\begin{say}
+``Flipping a photo cannot change how symmetric a face is. So if the detector gives different
+geometry for the photo and its mirror image, the detector is unsure, and we can measure
+that without any ground truth.''
+\end{say}
+
+\begin{careful}
+Flip test-time augmentation already exists in human-pose estimation, where it is used to
+improve accuracy. Do not claim flipping itself is new. What is new here is using it, for a
+\emph{symmetry} measurement, as a reliability signal and to cancel left/right bias.
+\end{careful}
+
+\subsection{Step 6: the quality and pose gate (\texttt{quality.py})}
+The gate looks at seven things the system can actually measure:
+\begin{center}\small
+\begin{tabular}{@{}p{3.4cm}p{6.6cm}p{5.4cm}@{}}
+\toprule
+Signal & How it is computed & Why it matters\\
+\midrule
+Face size & IOD in pixels & tiny faces: 1 pixel is a large \% of IOD\\
+Sharpness & $\log_{10}$ variance of the Laplacian of the face crop at 256\,px width & blur moves landmarks\\
+Brightness (low/high) & mean grey level of the face crop & dark or burnt-out faces\\
+Clipped pixels & share of crop pixels near black or white & lost detail\\
+$|$yaw$|$ & from the transformation matrix & foreshortens one side\\
+$|$pitch$|$ & from the transformation matrix & distorts proportions\\
+Mirror inconsistency $\delta$ & Step 5 & detector unsure\\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Decision rule:} each signal has a caution limit and a reject limit; the limits are
+stored in the file \texttt{configs/gate\_thresholds.json}. The \emph{worst} signal decides the
+status, and every triggered signal is listed with a plain-language reason. A rejected photo
+shows no score unless the user explicitly asks to see it, and it is then labelled unreliable.
+
+\textbf{How the limits were set (important for the viva):}
+\begin{itemize}
+\item \emph{A priori}, from the measurement's assumptions: yaw 10$^\circ$/20$^\circ$, pitch
+15$^\circ$/25$^\circ$, IOD 60/30\,px.
+\item \emph{From the training split}: percentiles of the 810 training faces (2.5th
+percentile for sharpness and brightness; 90th/99th for $\delta$; 97.5th for region validity).
+\item The test split was \textbf{never} used to choose any limit.
+\end{itemize}
+\textbf{Roll is not gated} because the fitted axis already handles it.
+
+\subsection{Step 7: the readable index}
+The app also shows $S = 100/(1+\alpha A)$ with $\alpha$ = \alphaIndex{}, chosen so that the
+median training face (A = \trainMedian\% IOD) scores 50. It is only a friendlier way to show
+$A$ (higher = more symmetric). \textbf{It is not a validated clinical or beauty scale.}
+
+\subsection{The four variants we compare}
+\begin{center}
+\begin{tabular}{@{}lp{11.5cm}@{}}
+\toprule
+M0 & Baseline: KD-tree matching, vertical midline, align + re-detect, / face width\\
+M1 & Fixed pairs + 68-point map + fitted axis, / IOD (no gate)\\
+M2 & M1 + quality/pose gate (without the mirror test)\\
+M3 & Full system: mirror-averaged landmarks, gate including $\delta$, region validity\\
+\bottomrule
+\end{tabular}
+\end{center}
+All four are computed from the \emph{same detections} of each image, so any difference comes
+from the method, not from detector randomness.
+
+%======================================================================
+\section{The data}
+%======================================================================
+\textbf{Dataset: LFPW} (Labelled Face Parts in the Wild), part of the 300-W benchmark. Each
+image has 68 landmarks placed by human experts. We used the copy published on GitHub by the
+Menpo project (\texttt{github.com/menpo/lfpw-train}, \texttt{lfpw-test}).
+\begin{itemize}
+\item \textbf{Train split} (811 images, 810 faces detected): used \emph{only} to fit the 478$\to$68
+map and to set gate limits.
+\item \textbf{Test split} (224 images, all detected): every reported number.
+\item Each photo is cropped around the annotated face first, as in the 300-W protocol.
+Many LFPW photos contain several people, and without the crop the detector sometimes
+analysed the wrong person (this initially caused a 32\% mean landmark error, which dropped
+to \nmeFitInner\% after the crop).
+\end{itemize}
+\textbf{Why not WFLW?} It was the first choice (it has pose, blur and occlusion subsets), but
+its images are hosted on Google Drive, which our compute environment could not reach. The
+code reads any 68-point \texttt{.pts} dataset, so WFLW or other 300-W subsets can be added later.\\
+\textbf{Licences and privacy:} 300-W is for research use only. No dataset image is stored
+in our repository or shown in the paper or slides; figures draw landmark geometry only.

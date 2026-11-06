@@ -1,0 +1,9 @@
+# Tested with Python 3.13 (Linux, CPU only). Exact versions used for the reported results.
+mediapipe==0.10.32
+opencv-python-headless==5.0.0.93
+numpy==2.5.3
+scipy==1.18.1
+pandas==3.0.5
+matplotlib==3.11.2
+streamlit==1.66.1
+pytest==9.1.1

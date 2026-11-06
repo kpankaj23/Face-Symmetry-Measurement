@@ -1,0 +1,36 @@
+\backcite {berlin2014asymmetry2d}{{1}{1}{section.1}}
+\backcite {varghaei2025aesthetic}{{1}{1}{section.1}}
+\backcite {liu2003asymmetry}{{1}{1}{section.1}}
+\backcite {kartynnik2019facemesh,mediapipe_facelandmarker}{{1}{1}{section.1}}
+\backcite {nashokan_facialasymmetry,yousrajnahi_symmetry,irimid}{{1}{1}{section.1}}
+\backcite {irimid}{{1}{1}{section*.1}}
+\backcite {nashokan_facialasymmetry, varghaei2025aesthetic,irimid}{{1}{1}{section*.3}}
+\backcite {nashokan_facialasymmetry,varghaei2025aesthetic}{{2}{1}{Item.1}}
+\backcite {newell2016stacked,wang2020hrnet}{{2}{2}{Item.2}}
+\backcite {geifman2017selective}{{2}{3}{Item.3}}
+\backcite {belhumeur2011lfpw}{{2}{2}{section*.4}}
+\backcite {sagonas2013_300w, sagonas2016_300w}{{2}{2}{section*.4}}
+\backcite {wu2018lab}{{2}{2}{section*.4}}
+\backcite {kartynnik2019facemesh,lugaresi2019mediapipe, mediapipe_facelandmarker}{{2}{2}{section*.4}}
+\backcite {berlin2014asymmetry2d}{{2}{2}{section*.5}}
+\backcite {klingenberg2002shape,mardia2000symmetry}{{2}{2}{section*.5}}
+\backcite {nashokan_facialasymmetry}{{2}{\caption@xref {??}{ on input line 50}}{table.caption.8}}
+\backcite {varghaei2025aesthetic}{{2}{\caption@xref {??}{ on input line 51}}{table.caption.8}}
+\backcite {yousrajnahi_symmetry}{{2}{\caption@xref {??}{ on input line 52}}{table.caption.8}}
+\backcite {irimid}{{2}{\caption@xref {??}{ on input line 53}}{table.caption.8}}
+\backcite {liu2003asymmetry}{{2}{2}{section*.5}}
+\backcite {varghaei2025aesthetic}{{2}{2}{section*.6}}
+\backcite {nashokan_facialasymmetry}{{2}{2}{section*.6}}
+\backcite {yousrajnahi_symmetry}{{2}{2}{section*.6}}
+\backcite {irimid}{{2}{2}{section*.6}}
+\backcite {geifman2017selective}{{2}{2}{section*.7}}
+\backcite {pertuz2013focus}{{2}{2}{section*.7}}
+\backcite {nashokan_facialasymmetry, varghaei2025aesthetic}{{3}{3.1}{subsection.3.1}}
+\backcite {pertuz2013focus}{{4}{3.4}{subsection.3.4}}
+\backcite {nashokan_facialasymmetry}{{4}{3.5}{subsection.3.5}}
+\backcite {belhumeur2011lfpw}{{4}{4.1}{subsection.4.1}}
+\backcite {sagonas2013_300w,sagonas2016_300w}{{4}{4.1}{subsection.4.1}}
+\backcite {menpo_lfpw}{{4}{4.1}{subsection.4.1}}
+\backcite {wu2018lab}{{4}{4.1}{subsection.4.1}}
+\backcite {nashokan_facialasymmetry}{{5}{\caption@xref {??}{ on input line 5}}{table.caption.14}}
+\backcite {zhu2016aflw2000}{{8}{6}{section.6}}

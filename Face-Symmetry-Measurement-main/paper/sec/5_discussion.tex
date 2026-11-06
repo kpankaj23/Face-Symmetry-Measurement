@@ -1,0 +1,51 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\paragraph{What worked.} Two changes give most of the gain over the public baseline: using
+the anatomical correspondence that the mesh already provides, and estimating the symmetry
+axis instead of assuming it. The mirror test is cheap, needs no labels, and gives the
+system a landmark-reliability signal that MediaPipe does not expose. The gate turns many
+silent failures into explicit refusals.
+
+\paragraph{What did not.} The mirror test cannot detect an occluded eye that the detector
+fills in consistently. On clean photos the gate does not predict small asymmetry errors
+better than chance, because those errors are dominated by symmetric landmark noise and
+by the detector's shrinkage towards symmetry.
+
+\paragraph{Limitations.}
+\begin{itemize}[leftmargin=*,itemsep=1pt,topsep=2pt]
+\item \textbf{2D only.} A photo is a projection. Yaw and pitch change the measured value
+(E8), and the gate can only limit, not remove, that effect. Camera perspective at selfie
+distance is not modelled.
+\item \textbf{Reference, not ground truth.} $A_{ref}$ uses expert landmarks, which contain
+annotator noise, and is subject to the same projection effects. We have no human
+symmetry ratings, and a validated perceptual or clinical scale was out of scope.
+\item \textbf{Dataset.} LFPW is small (224 test faces), in the wild and mostly non-frontal,
+and each identity appears once, so the pose strata are not paired. MediaPipe's training
+data is not public and could overlap with LFPW, so its NME here is not an independent
+benchmark claim. We use it only to compare mappings and gate signals.
+\item \textbf{Thresholds} are percentiles of one training distribution. A different camera
+or population would need re-calibration (\texttt{calibrate\_gate.py}).
+\item \textbf{Expression} is not controlled. A smile is asymmetric by nature, so the app
+asks for a neutral expression.
+\end{itemize}
+
+\paragraph{Ethics and privacy.}
+\label{sec:ethics}
+The output is a geometric indicator. It says nothing about health, identity or
+attractiveness, and the app states this. Dataset images are used under their research
+licence and are neither redistributed in the repository nor reproduced in this report.
+Figures draw landmark geometry on a blank canvas. The app processes uploads in memory and
+stores nothing.
+
+\section{Conclusion and Future Work}
+We built and evaluated a quality-aware facial asymmetry system that reports a measurement
+only when the image supports it. On LFPW it tracks an annotation-based reference much more
+closely than a re-implemented public baseline ($\rho$ \rhoMthree{} vs.\ \rhoMzero{}). Its
+mirror test flags unreliable landmarks without labels, and its gate cuts silent failures
+under degradation from \silentPoolOne\% to \silentPoolThree\%. The study also gives a
+practical warning: in uncontrolled photos, head yaw explains most of the measured 2D
+asymmetry. Future work: frontalisation with the detector's 3D landmarks, evaluated on a
+dataset with ground-truth pose (\eg AFLW2000-3D~\cite{zhu2016aflw2000}); appearance-based
+occlusion detection; WFLW's attribute subsets; and a small consented, multi-pose capture of
+the same people with human symmetry ratings.

@@ -1,0 +1,13 @@
+signal,level,n_images
+abs_yaw,reject,20
+abs_pitch,reject,2
+mirror_incons,reject,1
+abs_yaw,caution,60
+abs_pitch,caution,41
+iod_px,caution,16
+mirror_incons,caution,12
+brightness_hi,caution,10
+sharpness,caution,7
+n_faces,caution,6
+clipped,caution,4
+brightness_lo,caution,3

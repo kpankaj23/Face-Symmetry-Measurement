@@ -1,0 +1,11 @@
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Measure ($n$=224) & $\rho$ & $r$ & MAE\\
+\midrule
+M0 baseline~\cite{nashokan_facialasymmetry} (KD-tree, vert.\ midline) & 0.823 & 0.762 & --\\
+\quad M0 w/o alignment & 0.614 & 0.630 & --\\
+\quad M0 + fixed pairs (no KD-tree) & 0.931 & 0.903 & --\\
+M1: 68-pt pairs + fitted axis & 0.938 & 0.951 & 0.45\\
+M3: M1 + mirror averaging & 0.947 & 0.957 & 0.45\\
+\bottomrule
+\end{tabular}

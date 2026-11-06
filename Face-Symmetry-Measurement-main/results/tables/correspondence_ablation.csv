@@ -1,0 +1,3 @@
+correspondence,n,spearman,pearson,MAE,kdtree_wrong_partner_rate_mean
+KD-tree reflected nearest neighbour,224,0.8229265428144353,0.7618521197220227,,0.5832300669221088
+fixed canonical mirror pairs,224,0.9307367072389494,0.9030353557272675,,0.0

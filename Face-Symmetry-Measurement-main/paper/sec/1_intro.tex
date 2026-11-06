@@ -1,0 +1,63 @@
+\section{Introduction}
+\label{sec:intro}
+
+Bilateral facial symmetry is measured in orthodontics and maxillofacial
+surgery~\cite{berlin2014asymmetry2d}, in outcome assessment after facial plastic
+surgery~\cite{varghaei2025aesthetic}, and in face analysis research~\cite{liu2003asymmetry}.
+Dense face-landmark detectors such as MediaPipe Face
+Landmarker~\cite{kartynnik2019facemesh,mediapipe_facelandmarker} now run in real time on a
+laptop CPU, which has produced easy-to-use public tools that turn one selfie into a
+``symmetry score''~\cite{nashokan_facialasymmetry,yousrajnahi_symmetry,irimid}.
+
+\paragraph{Why this is harder than it looks.}
+A 2D photo is a projection. A head turned by a few degrees, a tilted camera, blur, poor
+lighting or an occluded region all change the measured left--right geometry, and the
+landmark detector may itself be biased towards a symmetric template. Most existing tools
+return a number for every input, and the one with input checks~\cite{irimid} does not
+consider head yaw or pitch. A user cannot tell whether a score of ``2\%'' reflects the
+face or the photo. Our experiments show that this is a real, large effect: on LFPW the
+asymmetry measured \emph{from expert annotations} rises from \yawLow\% to \yawHigh\% of the
+inter-ocular distance as head yaw grows from $<$5$^\circ$ to $\geq$20$^\circ$
+(\cref{fig:pose}).
+
+\paragraph{Problem statement.}
+\emph{Input:} a single RGB photo containing a face.
+\emph{Output:} (a) an accept/caution/reject decision with plain-language reasons;
+(b) when not rejected, a normalised global asymmetry $A$ and regional values $A_r$ for
+brows, eyes, nose, mouth and jaw, with a mirror-stability band and a per-region
+reliability flag; (c) visual overlays and a CSV/JSON export.
+\emph{Constraints:} 2D images only; a pre-trained detector and explicit geometry, with no
+model training; CPU real time (\runtime\,ms per image); no claims about 3D anatomy,
+health, identity or attractiveness.
+
+\paragraph{What is new.}
+Landmark detection, mirrored-landmark comparison, regional heatmaps and Streamlit
+front-ends all already exist in public code~\cite{nashokan_facialasymmetry,
+varghaei2025aesthetic,irimid}, and we do not claim them. Our contributions are:
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
+\item \textbf{A rotation-invariant measure with correct correspondence.} We pair the
+478 MediaPipe vertices using the exactly symmetric canonical face model, map them to the
+standard 68-point layout with a correspondence fitted on a training split and constrained
+to be mirror-consistent, and fit the symmetry axis by least squares. We quantify why this
+matters: the reflected nearest-neighbour (KD-tree) matching used in prior
+tools~\cite{nashokan_facialasymmetry,varghaei2025aesthetic} picks the wrong anatomical
+partner for \kdWrong\% of the points.
+\item \textbf{A mirror test for a symmetry measurement.} Horizontal-flip test-time
+augmentation is standard in pose and landmark
+estimation~\cite{newell2016stacked,wang2020hrnet}, where it is used for accuracy. We use it
+differently: \emph{flipping the image cannot change a face's asymmetry}, so the
+disagreement between the two detections is a label-free reliability signal, and their
+average removes any systematic left/right detector bias from the asymmetry estimate. In
+the public symmetry tools we audited (\cref{tab:related}) the score is computed from a
+single pass.
+\item \textbf{A calibrated quality/pose gate with region validity}, whose thresholds
+are fixed a priori or set on training data only. It is evaluated as \emph{selective
+measurement}~\cite{geifman2017selective}: how many unreliable scores it prevents and how
+much coverage it costs.
+\item \textbf{An evaluation protocol without symmetry labels.} No public dataset has
+ground-truth symmetry. We compare detector-based measurements with the identical measure
+computed from expert landmark annotations, and run 26 controlled perturbations. This
+gives the findings above, plus two that matter in practice: detector-based asymmetry is
+shrunk towards symmetry (by \shrinkGlobal\% overall, \shrinkMouth\% at the mouth), and
+the mirror test does \emph{not} detect an occluded eye.
+\end{enumerate}

@@ -1,0 +1,15 @@
+\begin{tabular}{@{}llll@{}}
+\toprule
+Signal & caution & reject & source\\
+\midrule
+face size (IOD) & $<$ 60 px & $<$ 30 px & a priori\\
+sharpness ($\log_{10}$ var. Lap.) & $<$ 1.4 & $<$ 0.756 & train pct.\\
+mean luma (low) & $<$ 59.3 & $<$ 35 & train pct. / a priori\\
+mean luma (high) & $>$ 164 & $>$ 225 & train pct. / a priori\\
+clipped pixels & $>$ 0.364 & $>$ 0.6 & train pct. / a priori\\
+$|$yaw$|$ & $>$ 10$^\circ$ & $>$ 20$^\circ$ & a priori\\
+$|$pitch$|$ & $>$ 15$^\circ$ & $>$ 25$^\circ$ & a priori\\
+mirror inconsistency $\delta$ & $>$ 0.0224 & $>$ 0.0489 & train pct.\\
+per-region $\delta_r$ (validity) & \multicolumn{2}{l}{unreliable if $>$ 0.0444} & train pct.\\
+\bottomrule
+\end{tabular}

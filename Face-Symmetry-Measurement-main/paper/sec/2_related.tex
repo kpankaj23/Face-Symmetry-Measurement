@@ -1,0 +1,62 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Facial landmark localisation.}
+Benchmarks such as LFPW~\cite{belhumeur2011lfpw} and 300-W~\cite{sagonas2013_300w,
+sagonas2016_300w} (68 points) and WFLW~\cite{wu2018lab} (98 points, with pose, expression,
+illumination, make-up, occlusion and blur subsets) drove accurate in-the-wild alignment.
+MediaPipe Face Mesh / Face Landmarker~\cite{kartynnik2019facemesh,lugaresi2019mediapipe,
+mediapipe_facelandmarker} regresses 468 surface vertices (+10 iris points) of a fixed
+canonical topology and a head-pose transformation matrix in real time on CPU. It returns
+no per-landmark confidence (its \texttt{visibility} and \texttt{presence} fields are empty);
+this gap is what motivated our mirror test.
+
+\paragraph{Quantifying facial asymmetry.}
+Clinical 2D methods compare paired landmarks about a reference
+midline~\cite{berlin2014asymmetry2d}. Geometric morphometrics avoids choosing a midline by
+superimposing a configuration with its relabelled reflection, separating symmetric and
+asymmetric shape components~\cite{klingenberg2002shape,mardia2000symmetry}. Our fitted axis
+follows this idea, restricted to a pure 2D reflection. Liu \etal~\cite{liu2003asymmetry}
+used image-based asymmetry for identification.
+
+\paragraph{Public symmetry tools.}
+Varghaei \etal~\cite{varghaei2025aesthetic} assess facial-plastic-surgery outcomes with
+frontal-image filtering, MediaPipe landmarks, KD-tree based mirrored matching and other
+morphometrics. Their surgical dataset is not public. The \textit{FacialAsymmetry}
+tool~\cite{nashokan_facialasymmetry} implements that symmetry method in Streamlit, with
+eye-based alignment, a vertical midline through vertices 33/263, KD-tree matching, seven
+regions and a heat map. \textit{Facial-symmetry-estimation}~\cite{yousrajnahi_symmetry}
+makes binary symmetric/asymmetric decisions for individual dlib 68-point features with a
+fixed tolerance. \textit{irimid}~\cite{irimid} computes anthropometric proportions and a
+symmetry index from 20 hand-picked MediaPipe vertex pairs about a vertical median midline.
+It also validates inputs with fixed rules on resolution, brightness, sharpness, in-plane
+tilt and a span-based occlusion heuristic. \Cref{tab:related} summarises the tools.
+Quality checks therefore exist, but none of these tools gates on out-of-plane pose (yaw,
+pitch), checks the landmarks themselves, calibrates its thresholds on data, or reports a
+quantitative evaluation of its score.
+
+\paragraph{Selective prediction and quality assessment.}
+A model that may abstain is evaluated with risk--coverage curves~\cite{geifman2017selective}.
+We apply this to measurements. Our image-quality signals are classical: variance of the
+Laplacian for focus~\cite{pertuz2013focus} and luminance statistics for exposure.
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & Landm. & Pairing & Axis & Regions & Gate & Eval.\\
+\midrule
+FacialAsym.~\cite{nashokan_facialasymmetry} & MP 478 & KD-tree & vertical & 7 & -- & --\\
+Varghaei~\cite{varghaei2025aesthetic} & MP 468 & KD-tree & vertical & -- & frontal & private\\
+yousrajnahi~\cite{yousrajnahi_symmetry} & dlib 68 & per feature & landm. line & 7 & -- & --\\
+irimid~\cite{irimid} & MP 478 & 20 fixed & vertical & 5 & fixed rules$^{*}$ & --\\
+\textbf{Ours} & MP$\to$68 & fixed & \textbf{fitted} & 5 & \textbf{7 signals} & \textbf{LFPW+pert.}\\
+\bottomrule
+\end{tabular}
+\caption{\textbf{What existing public implementations do} (from their READMEs and code,
+5~Nov~2026). ``Eval.'': quantitative evaluation reported. $^{*}$resolution, brightness,
+sharpness, roll, occlusion heuristic; no yaw/pitch. None of the tools checks landmark
+consistency (our mirror test).}
+\label{tab:related}
+\end{table}

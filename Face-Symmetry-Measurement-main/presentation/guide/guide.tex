@@ -1,0 +1,72 @@
+% Team study guide: explains the whole project part by part.
+% Build:  cd presentation/guide && latexmk -pdf guide.tex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[colorlinks,allcolors=blue!55!black]{hyperref}
+\usepackage[capitalize,nameinlink]{cleveref}
+
+\definecolor{navy}{HTML}{14213D}
+\definecolor{accent}{HTML}{2A78D6}
+\definecolor{warm}{HTML}{EB6834}
+\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{navy}}{\thesubsection}{0.5em}{}
+\setlist{itemsep=2pt,topsep=3pt}
+\setlength{\parskip}{4pt}
+
+\newtcolorbox{idea}[1][Key idea]{colback=accent!6,colframe=accent,fonttitle=\bfseries,title=#1,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt}
+\newtcolorbox{say}[1][Say it like this]{colback=black!3,colframe=black!45,fonttitle=\bfseries,title=#1,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt}
+\newtcolorbox{careful}[1][Be careful]{colback=warm!7,colframe=warm,fonttitle=\bfseries,title=#1,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small\color{black!60}Face Symmetry Measurement: team study guide}
+\rhead{\small\color{black!60}EE604, IIT Kanpur}
+\cfoot{\small\thepage}
+
+% the same auto-generated numbers that the paper uses
+\input{../../paper/tables/numbers}
+\graphicspath{{../../results/figures/}}
+\renewcommand{\cite}[1]{}  % the paper's tables cite the baseline; no bibliography here
+
+\begin{document}
+
+\begin{center}
+{\Huge\bfseries\color{navy} Face Symmetry Measurement}\\[6pt]
+{\Large Understanding the whole project, part by part}\\[10pt]
+{\large A study guide for presenting and defending the project}\\[8pt]
+Ankit Yadav (230150) \quad Ashish Porwal (230229) \quad Mahi Mittal (230617)\\
+Pankaj Kumar (230733) \quad Prutha Vinay (230807)\\[4pt]
+EE604 Image Processing, IIT Kanpur, November 2026
+\end{center}
+
+\vspace{4pt}
+\begin{idea}[How to use this guide]
+Everyone should read \textbf{Part 1} (the one-page summary) and \textbf{Part 9} (questions).
+Each part then stands on its own: read the parts for the slides you present. All numbers
+are produced by the project's scripts and are identical to those in the paper and slides.
+Boxes marked \emph{Say it like this} give wording you can use in the presentation;
+boxes marked \emph{Be careful} list claims you must \emph{not} make.
+\end{idea}
+
+\tableofcontents
+\newpage
+
+\input{part1}
+\input{part2}
+\input{part3}
+
+\end{document}

@@ -1,0 +1,52 @@
+% Overview of the proposed quality-aware measurement (M3). Drawn in TikZ so it is editable.
+\begin{figure*}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily\small, >=Stealth,
+  box/.style={draw=black!55, rounded corners=2pt, fill=#1, align=center, inner sep=4pt,
+              minimum height=1.0cm, text width=2.35cm},
+  box/.default=white,
+  arr/.style={->, thick, black!65},
+  lab/.style={font=\sffamily\scriptsize, text=black!65, align=center}
+]
+% column 1: input
+\node[box=black!4] (in) at (0,0) {Input photo $I$\\[-1pt]\scriptsize (single 2D image)};
+% column 2: two detections
+\node[box=blue!8]  (d1) at (3.3, 0.9) {Face Landmarker\\on $I$ $\rightarrow L$};
+\node[box=blue!8]  (d2) at (3.3,-0.9) {Face Landmarker\\on $\mathrm{flip}(I)$};
+% column 3: mirror test
+\node[box=blue!15, text width=2.9cm] (mt) at (6.9,-0.9) {\textbf{Mirror test}\\[-1pt]\scriptsize unflip $x\!\mapsto\!W\!-\!x$, re-index by\\[-2pt]\scriptsize canonical mirror map $\pi$ $\rightarrow U$};
+\node[box=blue!15, text width=2.9cm] (avg) at (6.9, 0.9) {$\bar L=\tfrac12(L+U)$\\[-1pt]\scriptsize $\delta=\overline{\|L-U\|}/\mathrm{IOD}$};
+% column 4: 68 mapping + axis
+\node[box=green!10, text width=2.7cm] (map) at (10.4, 0.9) {478$\rightarrow$68 map\\[-1pt]\scriptsize mirror-consistent,\\[-2pt]\scriptsize fitted on train split};
+\node[box=green!10, text width=2.7cm] (ax) at (10.4,-0.9) {\textbf{Fitted symmetry axis}\\[-1pt]\scriptsize $\min_{\theta,\rho}\sum_i\|\mathcal R_{\theta\rho}(p_{\pi(i)})-p_i\|^2$};
+% column 5: measures
+\node[box=green!18, text width=2.6cm] (meas) at (13.8,-0.9) {Global $A$, regional $A_r$\\[-1pt]\scriptsize $a_i=\|r_i\|/(2\,\mathrm{IOD})$};
+% gate
+\node[box=orange!18, text width=2.6cm] (gate) at (13.8, 0.9) {\textbf{Quality gate}\\[-1pt]\scriptsize size, sharpness, exposure,\\[-2pt]\scriptsize $|$yaw$|$, $|$pitch$|$, $\delta$, $\delta_r$};
+% output
+\node[box=black!6, text width=2.8cm] (out) at (17.3,0) {\textbf{Output}\\[-1pt]\scriptsize accept / caution / reject,\\[-2pt]\scriptsize $A\pm|A(L)-A(U)|$,\\[-2pt]\scriptsize reliable regions only};
+
+\draw[arr] (in.east) -- ++(0.35,0) |- (d1.west);
+\draw[arr] (in.east) -- ++(0.35,0) |- (d2.west);
+\draw[arr] (d2) -- (mt);
+\draw[arr] (d1.east) -- (avg.west);
+\draw[arr] (mt) -- (avg);
+\draw[arr] (avg) -- (map);
+\draw[arr] (map) -- (ax);
+\draw[arr] (ax) -- (meas);
+\draw[arr] (avg.north) -- ++(0,0.45) -| node[lab, pos=0.25, above]{$\delta$, per-region $\delta_r$} (gate.north);
+\draw[arr] (d1.north) -- ++(0,0.75) -| node[lab, pos=0.27, above]{pose (transformation matrix), face crop statistics} ([xshift=6mm]gate.north);
+\draw[arr] (gate.east) -- ++(0.3,0) |- ([yshift=2mm]out.west);
+\draw[arr] (meas.east) -- ++(0.3,0) |- ([yshift=-2mm]out.west);
+\end{tikzpicture}}
+\caption{\textbf{Overview of the proposed quality-aware measurement (variant M3).}
+The landmarker is run on the photo and on its mirror image. Because a horizontal flip only
+swaps anatomical sides, an ideal detector returns the same geometry twice; the disagreement
+$\delta$ is a ground-truth-free check of landmark reliability, and the average $\bar L$
+cancels any left/right bias of the detector. Asymmetry is measured on the standard 68-point
+layout with fixed anatomical pairs and a fitted (not assumed) symmetry axis, and a score is
+only reported when the quality/pose gate does not reject the image.}
+\label{fig:overview}
+\end{figure*}

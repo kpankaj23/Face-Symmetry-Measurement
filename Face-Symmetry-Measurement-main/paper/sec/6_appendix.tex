@@ -1,0 +1,64 @@
+\section{Team Contributions}
+\label{sec:contrib}
+\begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
+\item \textbf{Prutha Vinay (230807)}: project coordination; symmetry geometry engine
+(fitted axis, mirror test, \texttt{geometry.py}, \texttt{pipeline.py}); integration and
+repository maintenance.
+\item \textbf{Ankit Yadav (230150)}: dataset pipeline (LFPW/300-W loading, face crops), the
+mirror-consistent 478$\to$68 mapping fit and the landmark (NME) evaluation.
+\item \textbf{Ashish Porwal (230229)}: quality/pose gate design and calibration
+(\texttt{quality.py}, \texttt{calibrate\_gate.py}); perturbation experiments E4--E7.
+\item \textbf{Mahi Mittal (230617)}: Streamlit application and user interface,
+visualisation module and paper figures.
+\item \textbf{Pankaj Kumar (230733)}: literature and repository audit, re-implementation
+of the baseline (M0), ablation analysis and report/presentation writing.
+\end{itemize}
+All members reviewed the results and the report.
+
+\section{Code, Data and Resource Links}
+\textbf{Project repository:} \repo\\
+Run: \texttt{pip install -r requirements.txt}; \texttt{streamlit run app.py}.
+Reproduce all results: see \texttt{README.md} (\texttt{experiments/} scripts in order).
+
+\noindent\textbf{Datasets.}
+LFPW/300-W: \url{https://ibug.doc.ic.ac.uk/resources/300-W/};
+annotation scheme: \url{https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/};
+mirror used: \url{https://github.com/menpo/lfpw-train}, \url{https://github.com/menpo/lfpw-test};
+WFLW (considered): \url{https://github.com/wywu/LAB};
+CelebA (considered): \url{https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}.
+
+\noindent\textbf{Repositories and tools.}
+MediaPipe Face Landmarker: \url{https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker/python};
+canonical face model: \url{https://github.com/google-ai-edge/mediapipe/tree/master/mediapipe/modules/face_geometry/data};
+baseline method: \url{https://github.com/nashokan/FacialAsymmetry};
+\url{https://github.com/varghaei/face-aesthetics-analysis};
+\url{https://github.com/yousrajnahi/Facial-symmetry-estimation};
+\url{https://github.com/irimidlab/irimid};
+CVPR author kit: \url{https://github.com/cvpr-org/author-kit}.
+No code was copied from the audited repositories (none has a licence file); the baseline
+was re-implemented from its documented method.
+
+\section{Complete Source Code}
+\label{sec:code}
+The complete source code is listed below and is also available in the repository. Unit
+tests: \texttt{tests/test\_geometry.py} (15 tests, all passing).
+
+\onecolumn
+\subsection*{src/fsm/mesh.py}\lstinputlisting{code/src/fsm/mesh.py}
+\subsection*{src/fsm/geometry.py}\lstinputlisting{code/src/fsm/geometry.py}
+\subsection*{src/fsm/detector.py}\lstinputlisting{code/src/fsm/detector.py}
+\subsection*{src/fsm/quality.py}\lstinputlisting{code/src/fsm/quality.py}
+\subsection*{src/fsm/pipeline.py}\lstinputlisting{code/src/fsm/pipeline.py}
+\subsection*{src/fsm/data.py}\lstinputlisting{code/src/fsm/data.py}
+\subsection*{src/fsm/viz.py}\lstinputlisting{code/src/fsm/viz.py}
+\subsection*{app.py}\lstinputlisting{code/app.py}
+\subsection*{experiments/common.py}\lstinputlisting{code/experiments/common.py}
+\subsection*{experiments/cache\_detections.py}\lstinputlisting{code/experiments/cache_detections.py}
+\subsection*{experiments/fit\_mp68\_mapping.py}\lstinputlisting{code/experiments/fit_mp68_mapping.py}
+\subsection*{experiments/calibrate\_gate.py}\lstinputlisting{code/experiments/calibrate_gate.py}
+\subsection*{experiments/run\_clean\_eval.py}\lstinputlisting{code/experiments/run_clean_eval.py}
+\subsection*{experiments/run\_perturbations.py}\lstinputlisting{code/experiments/run_perturbations.py}
+\subsection*{experiments/summarize\_perturbations.py}\lstinputlisting{code/experiments/summarize_perturbations.py}
+\subsection*{experiments/make\_figures.py}\lstinputlisting{code/experiments/make_figures.py}
+\subsection*{experiments/make\_tables.py}\lstinputlisting{code/experiments/make_tables.py}
+\subsection*{tests/test\_geometry.py}\lstinputlisting{code/tests/test_geometry.py}
